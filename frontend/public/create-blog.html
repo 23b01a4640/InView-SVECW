@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Blog - InView</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <h1>InView</h1>
+    <a href="blogs.html" class="btn-create">Back to Blogs</a>
+  </header>
+  <main>
+    <h2>Create Your Experience</h2>
+    <form id="create-blog-form">
+      <div class="input-group">
+        <i class="fas fa-pen"></i>
+        <input type="text" id="title" placeholder="Title" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-align-left"></i>
+        <textarea id="content" placeholder="Write your experience..." required></textarea>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" id="author" placeholder="Your Name" required>
+      </div>
+      <button type="submit" class="btn">Publish</button>
+    </form>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
