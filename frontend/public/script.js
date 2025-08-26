@@ -1,56 +1,98 @@
-// Handle login form submission
+// Determine base URL for redirects and API calls
+function api(path) {
+  if (window.location.protocol === "file:" || !window.location.origin) {
+    return `http://localhost:8000${path}`;
+  }
+  return path; // relative path keeps same-origin
+}
+
+// Handle Login
 document.getElementById("login-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const response = await fetch("http://localhost:8000/user/login", {
+  const response = await fetch(api(`/user/login`), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ email, password }),
   });
 
-  if (response.redirected) {
-    window.location.href = response.url; // Redirect to blogs.html
+  const result = await response.json();
+  if (result.success) {
+    // Ensure redirect targets the running server
+    const target = result.redirect || "/blogs.html";
+    window.location.href = target;
   } else {
-    alert("Login failed. Check your email and password.");
+    alert(result.message || "Login failed");
   }
 });
 
-// Handle blog creation form submission
-document.getElementById("create-blog-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
+// Handle Signup
+document
+  .getElementById("signup-form")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const title = document.getElementById("title").value;
-  const content = document.getElementById("content").value;
-  const author = document.getElementById("author").value;
+    const fullName = document.getElementById("fullName").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-  const response = await fetch("http://localhost:8000/blog/create", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, content, author }),
+    const response = await fetch(api(`/user/signup`), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ fullName, email, password }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert("Signup successful! Please login.");
+      window.location.href = `/login.html`;
+    } else {
+      alert(result.message || "Signup failed");
+    }
   });
 
-  const result = await response.json();
-  
-  if (response.ok) {
-    alert("Blog published successfully!");
-    window.location.href = "/blogs.html"; // Redirect after publishing
-  } else {
-    alert(result.message || "Failed to publish blog");
-  }
-});
+// Handle Blog Creation
+document
+  .getElementById("create-blog-form")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-// Fetch and display all blogs
+    const title = document.getElementById("title").value;
+    const content = document.getElementById("content").value;
+    const author = document.getElementById("author").value;
 
+    const response = await fetch(api(`/blog/create`), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ title, content, author }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert("Blog published successfully!");
+      window.location.href = `/blogs.html`;
+    } else {
+      alert(result.message || "Failed to publish blog");
+    }
+  });
+
+// Fetch and display blogs
 async function fetchBlogs() {
   try {
-    const response = await fetch("http://localhost:8000/blog/all");
+    const response = await fetch(api(`/blog/all`), {
+      credentials: "include",
+    });
     const blogs = await response.json();
-    console.log(blogs); // Log the response to check if blogs are fetched
 
     const blogContainer = document.getElementById("blog-list");
+    if (!blogContainer) return;
+
     blogContainer.innerHTML = "";
 
     blogs.forEach((blog) => {
@@ -59,7 +101,9 @@ async function fetchBlogs() {
       blogElement.innerHTML = `
         <h3>${blog.title}</h3>
         <p>${blog.content}</p>
-        <small>By: ${blog.author} | ${new Date(blog.createdAt).toLocaleString()}</small>
+        <small>By: ${blog.author} | ${new Date(
+        blog.createdAt
+      ).toLocaleString()}</small>
       `;
       blogContainer.appendChild(blogElement);
     });
@@ -67,3 +111,10 @@ async function fetchBlogs() {
     console.error("Error fetching blogs:", error);
   }
 }
+
+// Auto-run on blogs page
+if (window.location.pathname.endsWith("/blogs.html")) {
+  fetchBlogs();
+}
+
+// (Removed profile modal logic)

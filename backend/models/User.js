@@ -21,7 +21,7 @@ const userSchema = new Schema(
     },
     profileImageURL: {
       type: String,
-      default: "/frontend/public/images/avatar.png",
+      default: "/images/avatar.png", // ✅ keep relative to public
     },
     role: {
       type: String,
@@ -32,13 +32,12 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-// Hash password before saving
+// 🔐 Hash password before saving
 userSchema.pre("save", function (next) {
   const user = this;
   if (!user.isModified("password")) return next();
 
-
-  const salt = randomBytes(16).toString();
+  const salt = randomBytes(16).toString("hex"); // ✅ specify hex
   const hashedPassword = createHmac("sha256", salt)
     .update(user.password)
     .digest("hex");
@@ -49,25 +48,19 @@ userSchema.pre("save", function (next) {
   next();
 });
 
+// 🔑 Match password for login
 userSchema.statics.matchPassword = async function (email, password) {
-    const user = await this.findOne({ email });  // Fix: Add `await` to fetch user
-    if (!user) throw new Error("User not found!");
+  const user = await this.findOne({ email });
+  if (!user) throw new Error("User not found!");
 
+  const userProvidedHash = createHmac("sha256", user.salt)
+    .update(password)
+    .digest("hex");
 
-    const salt = user.salt;
-    const hashedPassword = user.password;
+  if (user.password !== userProvidedHash) throw new Error("Incorrect Password");
 
-    // Fix: Use the provided password, not user.password
-    const userProvidedHash = createHmac("sha256", salt)
-        .update(password)  // Fix: Use `password`, not `user.password`
-        .digest("hex");
-
-    if (hashedPassword !== userProvidedHash) throw new Error("Incorrect Password");
-
-    return user;
+  return user;
 };
 
-
 const User = model("User", userSchema);
-
 module.exports = User;

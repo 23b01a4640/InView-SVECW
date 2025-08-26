@@ -1,6 +1,6 @@
 /* General Styles */
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f4f4f9;
@@ -19,11 +19,18 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-h1, h2 {
+h1,
+h2 {
   text-align: center;
 }
 
@@ -38,7 +45,8 @@ h1, h2 {
   color: #6a11cb;
 }
 
-input, textarea {
+input,
+textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
@@ -84,8 +92,14 @@ button:hover {
 }
 
 @keyframes slideIn {
-  from { transform: translateY(-50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .hero p {
@@ -149,3 +163,5 @@ header {
 .post:hover {
   transform: translateY(-10px);
 }
+
+/* (Removed profile modal and button styles) */
